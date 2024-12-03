@@ -1,0 +1,82 @@
+Could use this pattern for pipeline hashmap?
+
+
+use std::collections::HashMap;
+use std::any::TypeId;
+use std::any::Any;
+use std::fmt::Debug;
+use std::fmt::Display;
+
+struct Test{
+    map: HashMap<TypeId, Box<dyn Any>>
+}
+
+impl Test {
+    fn new() -> Self {
+        let map = HashMap::new();
+        Self {
+            map
+        }
+    }
+    
+    fn insert<T: 'static + Debug>(&mut self, value: T){
+        self.map.insert(TypeId::of::<T>(), Box::new(value));
+    }
+    
+    fn remove<T: 'static>(&mut self) {
+        self.map.remove(&TypeId::of::<T>());
+    }
+    
+    fn get<T: 'static + Debug>(&self) -> Option<&T> {
+        let value = self.map.get(&TypeId::of::<T>())?;
+        unsafe { 
+            Some(&*<*const _>::cast(value.as_ref()))
+        }
+    }
+    
+    fn get_mut<T: 'static + Debug>(&mut self) -> Option<&mut T> {
+        let value = self.map.get_mut(&TypeId::of::<T>())?;
+        unsafe { 
+            Some(&mut *<*mut _>::cast(value.as_mut()))
+        }
+    }
+    
+    
+}
+
+fn main() {
+    let _i32:i32 = 55;
+    let _string:String = String::from("test");
+    let mut test = Test::new();
+    test.insert(_i32);
+    test.insert(_string);
+    
+    println!("int: {:?}, string: {:?}", test.get::<i32>(), test.get::<String>());
+    
+    /*if let Some(mut mut_ref) = test.get_mut::<i32>(){
+        *mut_ref = 28;
+    }
+    println!("int: {}, string: {}", test.get::<i32>(), test.get::<String>());
+    
+    test.remove::<String>();
+    println!("int: {}, string: {}", test.get::<i32>(), test.get::<String>());*/
+
+}
+
+
+let test: Box<dyn Test + Send + Sync> = Box::new(TestConcrete{});
+    let store = Arc::new(RwLock::new(test));
+
+
+    thread::scope(|s| { 
+        s.spawn(|| {
+            let test = store.write().unwrap();
+            thread::sleep(time::Duration::from_millis(10000));
+            println!("Sleep 10 done");
+        });
+        s.spawn(|| {
+            let test = store.write().unwrap();
+            thread::sleep(time::Duration::from_millis(2));
+            println!("Sleep 2 done");
+        });
+    });   

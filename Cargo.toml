@@ -1,0 +1,24 @@
+[package]
+name = "balloon"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.89"
+bytemuck = "1.19.0"
+glam = {version="0.29.0", features=["bytemuck"]}
+itertools = "0.13.0"
+lazy_static = "1.5.0"
+once_cell = "1.20.2"
+rand = "0.8.5"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
+uuid = "1.10.0"
+vulkano = "0.34.0"
+vulkano-shaders = "0.34.0"
+winit = {version="0.30.5", features=["rwh_05"]}
+
+[profile.dev]
+opt-level = 1 
