@@ -42,9 +42,9 @@ impl Controller for ColorController {
             if let Some(my_mesh_filter) = mesh_filter_components[index].as_mut() {
                 for vertex in &mut my_mesh_filter.indexed_verts.verts {
                     vertex.color = Vec3 {
-                        x: rng.gen_range(0.0..0.1),
-                        y: rng.gen_range(0.0..0.4),
-                        z: rng.gen_range(0.55..1.0),
+                        x: rng.gen_range(0..=1) as f32,
+                        y: rng.gen_range(0..1) as f32,
+                        z: rng.gen_range(0..1) as f32,
                     };
                     vertex.position = Vec3 {
                         x: vertex.position.x + rng.gen_range(-0.01..0.01),

@@ -16,42 +16,62 @@
 use std::sync::{Arc, RwLock};
 
 use std::thread;
+use rayon::prelude::*;
+use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use crate::{app::Input, component::controller::Controller, scene::{Scene}};
 
 
 pub struct ControllerSystem {
-
+   
 }
 
 impl ControllerSystem {
 
     pub fn new() -> Self {
+      
         Self {}
     }
 
     pub fn run(&self, scene: Arc<RwLock<Scene>>, current_input: Input) {
-        let mut thread_join_handle;
-        let binding = scene.read().unwrap().get_component_vec::<Arc<RwLock<Box<dyn Controller>>>>().unwrap();
-        let controllers = binding.read().unwrap().clone();
+        //let mut thread_join_handle;
+        //let binding = scene.read().unwrap().get_component_vec::<Arc<RwLock<Box<dyn Controller>>>>().unwrap();
+        //let controllers = binding.read().unwrap().clone();
         
-        let mut handles = vec![];
+     
+
         
-        //let mut value = scene.clone();
-        for (index, controller) in controllers.into_iter().enumerate() {
-            
+        
+        //for (index, controller) in controllers.into_iter().enumerate() {
+        //    if let Some(controller) = controller {
+        //        controller.write().unwrap().update(index, scene.clone());
+        //    }
+        //}
+
+        //let controllers: Vec<Arc<RwLock<Box<dyn Controller+ 'static>>>> = controllers.into_iter().filter_map(|controller: Option<Arc<RwLock<Box<dyn Controller>>>>| Some(controller)?).collect();
+        /*controllers.into_par_iter().enumerate().for_each(|(index, controller)|{
+            //let new_scene = scene.clone();
             if let Some(controller) = controller {
+                controller.write().unwrap().update(index, scene.clone());
+            }
+        });*/
+
+
+            //if let Some(controller) = controller {
+            //    controller.write().unwrap().update(index, scene.clone());
+           // }
+            /*if let Some(controller) = controller {
                 let new_scene = scene.clone();
                 thread_join_handle = thread::spawn(move || {
                     let scene = new_scene;
                     controller.write().unwrap().update(index, scene);
                 });
                 handles.push(thread_join_handle);
-            }
-        }
+            } */
+        //}
 
-        for thread_join_handle in handles {
-            let _ = thread_join_handle.join();
-        }
+        //for thread_join_handle in handles {
+        //    let _ = thread_join_handle.join();
+        //}
         //drop(scene_r_lock);
         //: RwLockWriteGuard<'_,&dyn ComponentVec>
         //let mut map: HashMap<TypeId, Box<dyn Any>> = HashMap::new();

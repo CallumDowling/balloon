@@ -169,16 +169,10 @@ impl ApplicationHandler<UserEvent> for App {
             }
         }
 
-        //info!("About to redraw");
-        //make_some_tris(self.scenes[0].clone(), 1);
+
         self.game_loop();
         self.renderer_system.redraw();
-        //make_some_tris(self.scenes[0].clone(), 1);
 
-        //make_some_tris(self.scenes[0].clone());
-        //info!("About to redraw");
-        //self.renderer_system.redraw();
-        //(**self).new_events(event_loop, cause);
     }
     fn user_event(&mut self, event_loop: &ActiveEventLoop, user_event: UserEvent) {
         // Handle user event.
@@ -195,12 +189,6 @@ impl ApplicationHandler<UserEvent> for App {
             Some(time) => {
                 let now = Instant::now();
                 let elapsed = now.saturating_duration_since(time);
-                /*println!(
-                    "Window events: {:?}, fps:{:?}, entities: {}",
-                    elapsed,
-                    1f64 / elapsed.as_secs_f64(),
-                    self.scenes[0].read().unwrap().entities_index
-                );*/
                 self.last_window_events_time = Some(now);
             }
             None => {

@@ -96,7 +96,7 @@ impl SceneCreate<SceneOne> for Scene {
             crate::prefabs::cube111::CubeType::ROTATOR,
         )
         .unwrap();
-        for x in 0..1 {
+        for x in 0..15 {
             let cube_index =
                 make_111_cube(scene.clone(), crate::prefabs::cube111::CubeType::ROTATOR).unwrap();
             info!("3");

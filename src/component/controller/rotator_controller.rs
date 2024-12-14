@@ -50,7 +50,7 @@ impl Controller for RotatorController {
                 ]
             }
         );
-        event_batch*/
+        event_batch
     
         drop(transform_components);
         drop(scene_lock);
@@ -67,6 +67,7 @@ impl Controller for RotatorController {
             self.last_update = now;
             
         }
+        */
         //info!("End of update");
     }
 }

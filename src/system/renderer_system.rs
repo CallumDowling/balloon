@@ -264,8 +264,7 @@ impl RendererSystem {
             self.swapchain = new_swapchain;
             self.images = new_images;
             // Need to update aspect ratio
-            aspect_ratio =
-                self.swapchain.image_extent()[0] as f32 / self.swapchain.image_extent()[1] as f32;
+            aspect_ratio = self.swapchain.image_extent()[0] as f32 / self.swapchain.image_extent()[1] as f32;
             self.renderpass =  Some(vulkano::single_pass_renderpass!(
                 self.device.clone(),
                 attachments: {
@@ -533,43 +532,4 @@ fn get_camera_view_and_projection(current_scene: Arc<RwLock<Scene>>) -> (Mat4, M
     (Mat4::IDENTITY, Mat4::IDENTITY)
 }
 
-/*fn generate_vertices(
-    current_scene: Arc<RwLock<Scene>>,
-) -> HashMap<String, Vec<(Mat4, Vec<Vertex>)>> {
-    let current_scene = current_scene.read().unwrap();
-    let mut vertices: HashMap<String, Vec<(Mat4, Vec<Vertex>)>> = HashMap::new();
-    let Some(mesh_filters) = current_scene.borrow_component_vec::<MeshFilterComponent>() else {
-        panic!("mesh_filters missing");
-    };
-    let Some(transforms) = current_scene.borrow_component_vec::<TransformComponent>() else {
-        panic!("transforms missing");
-    };
-    let Some(mesh_renderers) = current_scene.borrow_component_vec::<MeshRendererComponent>() else {
-        panic!("mesh_renderer missing");
-    };
-    //let mut mesh_filters = current_scene.borrow_component_vec_mut::<MeshFilterComponent>().unwrap();
-    let zip = izip!(
-        transforms.iter(),
-        mesh_filters.iter(),
-        mesh_renderers.iter()
-    );
-    let iter = zip.filter_map(|(transform, mesh_filter, mesh_renderer)| {
-        Some((
-            transform.as_ref()?,
-            mesh_filter.as_ref()?,
-            mesh_renderer.as_ref()?,
-        ))
-    });
-    //info!("Scene t0: {:?}",current_scene);
 
-    for (transform, mesh_filter, mesh_render) in iter {
-        vertices
-            .entry(mesh_render.pipeline_key.clone())
-            .and_modify(|verts| verts.push((transform.transform, mesh_filter.vertices.clone())))
-            .or_insert(vec![(transform.transform, mesh_filter.vertices.clone())]);
-
-        //vertices.extend(mesh_filter.vertices.clone());
-    }
-    //info!("verts {:?}", vertices);
-    vertices
-*/
