@@ -79,7 +79,9 @@ pub struct RendererSystem {
     current_scene: Arc<RwLock<Scene>>,
     current_window: Arc<Window>,
     first_camera_update: bool, //viewport: Viewport,
-    renderpass: Option<Arc<RenderPass>>
+    renderpass: Option<Arc<RenderPass>>,
+    depth_buffer: Option<Arc<ImageView>>,
+    frame_buffers: Option<Vec<Arc<Framebuffer>>>
 }
 
 impl RendererSystem {
@@ -242,7 +244,9 @@ impl RendererSystem {
             current_scene: Arc::clone(&scene),
             current_window: Arc::clone(&window),
             first_camera_update: false,
-            renderpass: None
+            renderpass: None,
+            depth_buffer: None,
+            frame_buffers: None
 
         })
     }
@@ -286,7 +290,41 @@ impl RendererSystem {
                     depth_stencil: {depth_stencil},
                 },
             )
-            .unwrap());    
+            .unwrap());
+
+                //Only need this to include it in framebuffers ???
+            self.depth_buffer = Some(ImageView::new_default(
+                Image::new(
+                    self.memory_allocator.clone(),
+                    ImageCreateInfo {
+                        image_type: ImageType::Dim2d,
+                        format: Format::D16_UNORM,
+                        extent: self.images[0].extent(),
+                        usage: ImageUsage::DEPTH_STENCIL_ATTACHMENT | ImageUsage::TRANSIENT_ATTACHMENT,
+                        ..Default::default()
+                    },
+                    AllocationCreateInfo::default(),
+                )
+                .unwrap(),
+            )
+            .unwrap());
+
+            self.frame_buffers = Some(self
+                .images
+                .iter()
+                .map(|image| {
+                    let view = ImageView::new_default(image.clone()).unwrap();
+                    Framebuffer::new(
+                        self.renderpass.as_mut().unwrap().clone(),
+                        FramebufferCreateInfo {
+                            attachments: vec![view, self.depth_buffer.as_ref().unwrap().clone()],
+                            ..Default::default()
+                        },
+                    )
+                    .unwrap()
+                })
+                .collect::<Vec<_>>());
+
             for (index, pipeline) in self.pipelines.iter_mut() {
                 if let Some(pipeline) = pipeline.downcast_mut::<Teapot>() {
                     info!("Teapot renderer being created");
@@ -319,41 +357,6 @@ impl RendererSystem {
             self.first_camera_update = true;
         }
       
-
-        //Only need this to include it in framebuffers ???
-        let depth_buffer = ImageView::new_default(
-            Image::new(
-                self.memory_allocator.clone(),
-                ImageCreateInfo {
-                    image_type: ImageType::Dim2d,
-                    format: Format::D16_UNORM,
-                    extent: self.images[0].extent(),
-                    usage: ImageUsage::DEPTH_STENCIL_ATTACHMENT | ImageUsage::TRANSIENT_ATTACHMENT,
-                    ..Default::default()
-                },
-                AllocationCreateInfo::default(),
-            )
-            .unwrap(),
-        )
-        .unwrap();
-
-        let framebuffers = self
-            .images
-            .iter()
-            .map(|image| {
-                let view = ImageView::new_default(image.clone()).unwrap();
-                Framebuffer::new(
-                    self.renderpass.as_mut().unwrap().clone(),
-                    FramebufferCreateInfo {
-                        attachments: vec![view, depth_buffer.clone()],
-                        ..Default::default()
-                    },
-                )
-                .unwrap()
-            })
-            .collect::<Vec<_>>();
-
-
         let (view, proj) = get_camera_view_and_projection(self.current_scene.clone());
 
         //let proj = Perspective3::new(image_extent[0] as f32/ image_extent[1] as f32, fovy, znear, zfar);
@@ -405,7 +408,7 @@ impl RendererSystem {
             .begin_render_pass(
                 RenderPassBeginInfo {
                     clear_values: vec![Some([1.0, 1.0, 1.0, 1.0].into()), Some(1f32.into())],
-                    ..RenderPassBeginInfo::framebuffer(framebuffers[image_index as usize].clone())
+                    ..RenderPassBeginInfo::framebuffer(self.frame_buffers.as_ref().unwrap()[image_index as usize].clone())
                 },
                 Default::default(),
             )

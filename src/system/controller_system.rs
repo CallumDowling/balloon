@@ -34,8 +34,8 @@ impl ControllerSystem {
 
     pub fn run(&self, scene: Arc<RwLock<Scene>>, current_input: Input) {
         //let mut thread_join_handle;
-        //let binding = scene.read().unwrap().get_component_vec::<Arc<RwLock<Box<dyn Controller>>>>().unwrap();
-        //let controllers = binding.read().unwrap().clone();
+        let binding = scene.read().unwrap().get_component_vec::<Arc<RwLock<Box<dyn Controller>>>>().unwrap();
+        let controllers = binding.read().unwrap().clone();
         
      
 
@@ -48,12 +48,12 @@ impl ControllerSystem {
         //}
 
         //let controllers: Vec<Arc<RwLock<Box<dyn Controller+ 'static>>>> = controllers.into_iter().filter_map(|controller: Option<Arc<RwLock<Box<dyn Controller>>>>| Some(controller)?).collect();
-        /*controllers.into_par_iter().enumerate().for_each(|(index, controller)|{
+        controllers.into_par_iter().enumerate().for_each(|(index, controller)|{
             //let new_scene = scene.clone();
             if let Some(controller) = controller {
                 controller.write().unwrap().update(index, scene.clone());
             }
-        });*/
+        });
 
 
             //if let Some(controller) = controller {

@@ -185,21 +185,10 @@ impl ApplicationHandler<UserEvent> for App {
         window_id: WindowId,
         event: WindowEvent,
     ) {
-        match self.last_window_events_time {
-            Some(time) => {
-                let now = Instant::now();
-                let elapsed = now.saturating_duration_since(time);
-                self.last_window_events_time = Some(now);
-            }
-            None => {
-                let now = Instant::now();
-                self.last_window_events_time = Some(now);
-            }
-        }
         match event {
             WindowEvent::CloseRequested {} => {
                 let _ = self.windows.remove(&window_id);
-        }
+            }
             WindowEvent::Resized(_) => {
                 info!("Resized window");
                 self.renderer_system.recreate_swapchain = true;
